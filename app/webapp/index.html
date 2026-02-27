@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pappy</title>
+    <link rel="stylesheet" href="/app/styles.css" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div class="title">Pappy</div>
+        <div class="subtitle">Реферальные награды</div>
+      </header>
+
+      <nav class="tabs">
+        <button class="tab-button active" data-tab="dashboard">Главная</button>
+        <button class="tab-button" data-tab="exchange">Обмен</button>
+        <button class="tab-button" data-tab="leaderboard">Лидеры</button>
+      </nav>
+
+      <main class="content">
+        <section id="dashboard" class="tab-content active">
+          <div class="card balance-card">
+            <div class="label">Баланс Pappy</div>
+            <div class="balance">
+              <span id="balance-value">0.00</span>
+            </div>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Прогресс уровня</span>
+                <span id="progress-text">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="card mini-card">
+              <div class="label">Приглашено</div>
+              <div class="value" id="referrals-value">0</div>
+            </div>
+            <div class="card mini-card">
+              <div class="label">Уровень</div>
+              <div class="value" id="level-value">—</div>
+            </div>
+            <div class="card mini-card">
+              <div class="label">Активность рефералов</div>
+              <div class="value" id="activity-value">0</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="exchange" class="tab-content">
+          <div class="section-title">Обмен Pappy на скины</div>
+          <div class="card-grid">
+            <div class="card reward-card" data-amount="10">
+              <div class="reward-amount">10 Pappy</div>
+              <div class="reward-name">Очень дешевый скин</div>
+              <button class="primary-button">Обменять</button>
+            </div>
+            <div class="card reward-card" data-amount="20">
+              <div class="reward-amount">20 Pappy</div>
+              <div class="reward-name">Дешевый скин</div>
+              <button class="primary-button">Обменять</button>
+            </div>
+            <div class="card reward-card" data-amount="50">
+              <div class="reward-amount">50 Pappy</div>
+              <div class="reward-name">Средний скин</div>
+              <button class="primary-button">Обменять</button>
+            </div>
+            <div class="card reward-card" data-amount="100">
+              <div class="reward-amount">100 Pappy</div>
+              <div class="reward-name">Дорогой скин</div>
+              <button class="primary-button">Обменять</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="leaderboard" class="tab-content">
+          <div class="section-title">Топ по Pappy</div>
+          <div id="leaderboard-list" class="leaderboard-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <div id="modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-title">Подтверждение обмена</div>
+        <div class="modal-subtitle" id="modal-reward"></div>
+        <label class="input-label" for="steam-link">SteamLink</label>
+        <input
+          id="steam-link"
+          class="text-input"
+          type="text"
+          placeholder="Вставьте SteamLink"
+          autocomplete="off"
+        />
+        <div class="modal-actions">
+          <button id="modal-confirm" class="primary-button">Подтвердить</button>
+          <button id="modal-cancel" class="ghost-button">Отмена</button>
+        </div>
+        <div id="modal-error" class="error-message"></div>
+      </div>
+    </div>
+
+    <script src="/app/app.js"></script>
+  </body>
+</html>
