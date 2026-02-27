@@ -14,6 +14,8 @@ _config = load_config()
 
 
 def _webapp_keyboard() -> InlineKeyboardMarkup:
+    if not _config.webapp_url:
+        return InlineKeyboardMarkup(inline_keyboard=[])
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -59,4 +61,7 @@ async def cmd_start(message: Message, command: CommandObject, bot: Bot) -> None:
     if assigned:
         text += "\n\nРеферальная привязка подтверждена."
 
-    await message.answer(text, reply_markup=_webapp_keyboard())
+    reply_markup = _webapp_keyboard() if _config.webapp_url else None
+    if not _config.webapp_url:
+        text += "\n\nWEBAPP_URL пока не настроен."
+    await message.answer(text, reply_markup=reply_markup)

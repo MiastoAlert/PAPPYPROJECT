@@ -28,7 +28,7 @@ class Config:
     bot_token: str
     admin_ids: set[int]
     group_id: int | None
-    webapp_url: str
+    webapp_url: str | None
     db_path: str
 
 
@@ -42,9 +42,7 @@ def load_config() -> Config:
     group_id_raw = os.getenv("GROUP_ID", "").strip()
     group_id = int(group_id_raw) if group_id_raw else None
 
-    webapp_url = os.getenv("WEBAPP_URL", "").strip()
-    if not webapp_url:
-        raise RuntimeError("WEBAPP_URL не задан в переменных окружения.")
+    webapp_url = os.getenv("WEBAPP_URL", "").strip() or None
 
     db_path = os.getenv("DB_PATH", "./pappy.sqlite3").strip()
 
