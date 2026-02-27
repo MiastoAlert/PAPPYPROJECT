@@ -16,8 +16,6 @@ const elements = {
   leaderboardList: document.getElementById("leaderboard-list"),
   referralLink: document.getElementById("referral-link"),
   copyLink: document.getElementById("copy-link"),
-  chatLinkWrap: document.getElementById("chat-link-wrap"),
-  chatLink: document.getElementById("chat-link"),
   authWarning: document.getElementById("auth-warning"),
   modal: document.getElementById("modal"),
   modalReward: document.getElementById("modal-reward"),
@@ -91,12 +89,6 @@ async function loadProfile() {
     } else {
       elements.referralLink.textContent = "Ссылка появится позже.";
       elements.copyLink.disabled = true;
-    }
-    if (data.group_invite_url) {
-      elements.chatLink.href = data.group_invite_url;
-      elements.chatLinkWrap.classList.remove("hidden");
-    } else {
-      elements.chatLinkWrap.classList.add("hidden");
     }
   } catch (error) {
     showAlert(error.message);

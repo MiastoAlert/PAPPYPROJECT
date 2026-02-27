@@ -16,7 +16,14 @@ from pydantic import BaseModel
 
 from app.config import load_config
 from app.database.db import get_db
-from app.database.queries import ensure_user, get_top_users, get_user, try_exchange
+from app.database.queries import (
+    ensure_user,
+    get_invite_link_for_user,
+    get_top_users,
+    get_user,
+    save_invite_link,
+    try_exchange,
+)
 from app.services.levels import get_level
 
 config = load_config()
@@ -89,15 +96,25 @@ async def api_me(request: Request) -> dict[str, Any]:
         await ensure_user(db, user_id, username)
         row = await get_user(db, user_id)
 
+        referral_link = None
+        if config.group_id is not None:
+            referral_link = await get_invite_link_for_user(db, user_id)
+            if referral_link is None:
+                try:
+                    invite = await bot.create_chat_invite_link(
+                        chat_id=config.group_id,
+                        name=f"ref-{user_id}",
+                    )
+                    referral_link = invite.invite_link
+                    await save_invite_link(db, user_id, referral_link)
+                except Exception:
+                    referral_link = None
+
     if not row:
         raise HTTPException(status_code=404, detail="Пользователь не найден.")
 
     total_referrals = int(row["total_referrals"])
     level = get_level(total_referrals)
-
-    referral_link = (
-        f"https://t.me/{bot_username}?start={user_id}" if bot_username else None
-    )
 
     return {
         "id": user_id,
@@ -107,7 +124,6 @@ async def api_me(request: Request) -> dict[str, Any]:
         "total_referral_messages": int(row["total_referral_messages"]),
         "level": level,
         "referral_link": referral_link,
-        "group_invite_url": config.group_invite_url,
     }
 
 

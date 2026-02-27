@@ -11,8 +11,10 @@ from app.database.queries import (
     add_referral,
     can_count_message,
     ensure_user,
+    get_inviter_by_invite_link,
     get_user,
     increment_inviter_for_message,
+    set_invited_by,
 )
 
 router = Router()
@@ -33,9 +35,16 @@ async def handle_new_members(message: Message) -> None:
     if not _is_target_group(message):
         return
 
+    invite_link = message.invite_link.invite_link if message.invite_link else None
     async with get_db() as db:
         for member in message.new_chat_members:
             await ensure_user(db, member.id, member.username)
+            if invite_link:
+                inviter_id = await get_inviter_by_invite_link(db, invite_link)
+                if inviter_id and inviter_id != member.id:
+                    assigned = await set_invited_by(db, member.id, inviter_id)
+                    if assigned:
+                        await add_referral(db, inviter_id, member.id)
             row = await get_user(db, member.id)
             if not row:
                 continue

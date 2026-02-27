@@ -71,6 +71,35 @@ async def add_referral(
     return True
 
 
+async def get_invite_link_for_user(
+    db: aiosqlite.Connection, user_id: int
+) -> str | None:
+    row = await db.execute_fetchone(
+        "SELECT invite_link FROM invite_links WHERE user_id = ?", (user_id,)
+    )
+    return row["invite_link"] if row else None
+
+
+async def save_invite_link(
+    db: aiosqlite.Connection, user_id: int, invite_link: str
+) -> None:
+    await db.execute(
+        "INSERT OR REPLACE INTO invite_links (user_id, invite_link, created_at) "
+        "VALUES (?, ?, ?)",
+        (user_id, invite_link, int(time.time())),
+    )
+    await db.commit()
+
+
+async def get_inviter_by_invite_link(
+    db: aiosqlite.Connection, invite_link: str
+) -> int | None:
+    row = await db.execute_fetchone(
+        "SELECT user_id FROM invite_links WHERE invite_link = ?", (invite_link,)
+    )
+    return int(row["user_id"]) if row else None
+
+
 async def can_count_message(
     db: aiosqlite.Connection, user_id: int, now_ts: int
 ) -> bool:

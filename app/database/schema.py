@@ -46,6 +46,15 @@ async def init_db(db: aiosqlite.Connection) -> None:
         )
         """
     )
+    await db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS invite_links (
+            user_id INTEGER PRIMARY KEY,
+            invite_link TEXT NOT NULL UNIQUE,
+            created_at INTEGER NOT NULL
+        )
+        """
+    )
 
     await db.execute(
         "CREATE INDEX IF NOT EXISTS idx_users_balance ON users(balance DESC)"
@@ -58,5 +67,8 @@ async def init_db(db: aiosqlite.Connection) -> None:
     )
     await db.execute(
         "CREATE INDEX IF NOT EXISTS idx_exchanges_user ON exchanges(user_id)"
+    )
+    await db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_invite_links_link ON invite_links(invite_link)"
     )
     await db.commit()
