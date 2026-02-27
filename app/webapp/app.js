@@ -14,6 +14,11 @@ const elements = {
   progressText: document.getElementById("progress-text"),
   progressFill: document.getElementById("progress-fill"),
   leaderboardList: document.getElementById("leaderboard-list"),
+  referralLink: document.getElementById("referral-link"),
+  copyLink: document.getElementById("copy-link"),
+  chatLinkWrap: document.getElementById("chat-link-wrap"),
+  chatLink: document.getElementById("chat-link"),
+  authWarning: document.getElementById("auth-warning"),
   modal: document.getElementById("modal"),
   modalReward: document.getElementById("modal-reward"),
   modalConfirm: document.getElementById("modal-confirm"),
@@ -35,6 +40,9 @@ function getHeaders() {
 }
 
 async function fetchJSON(path, options = {}) {
+  if (!tg || !tg.initData) {
+    throw new Error("Откройте мини-приложение через Телеграм.");
+  }
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
@@ -77,6 +85,19 @@ async function loadProfile() {
     elements.activity.textContent = data.total_referral_messages;
     elements.progressText.textContent = `${data.level.progress_percent}%`;
     elements.progressFill.style.width = `${data.level.progress_percent}%`;
+    if (data.referral_link) {
+      elements.referralLink.textContent = data.referral_link;
+      elements.copyLink.disabled = false;
+    } else {
+      elements.referralLink.textContent = "Ссылка появится позже.";
+      elements.copyLink.disabled = true;
+    }
+    if (data.group_invite_url) {
+      elements.chatLink.href = data.group_invite_url;
+      elements.chatLinkWrap.classList.remove("hidden");
+    } else {
+      elements.chatLinkWrap.classList.add("hidden");
+    }
   } catch (error) {
     showAlert(error.message);
   }
@@ -108,6 +129,20 @@ function showAlert(message) {
     tg.showAlert(message);
   } else {
     alert(message);
+  }
+}
+
+async function copyReferral() {
+  const text = elements.referralLink.textContent;
+  if (!text || text === "—" || text === "Ссылка появится позже.") {
+    showAlert("Ссылка пока не готова.");
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    showAlert("Ссылка скопирована.");
+  } catch (error) {
+    showAlert("Не удалось скопировать ссылку.");
   }
 }
 
@@ -186,11 +221,17 @@ elements.modal.addEventListener("click", (event) => {
     closeModal();
   }
 });
+elements.copyLink.addEventListener("click", copyReferral);
 
 setupTabs();
 setupRewards();
-loadProfile();
-loadLeaderboard();
+
+if (!tg || !tg.initData) {
+  elements.authWarning.classList.remove("hidden");
+} else {
+  loadProfile();
+  loadLeaderboard();
+}
 
 if (tg) {
   tg.ready();

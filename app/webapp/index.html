@@ -14,6 +14,10 @@
         <div class="subtitle">Реферальные награды</div>
       </header>
 
+      <div id="auth-warning" class="warning hidden">
+        Откройте мини-приложение через Телеграм.
+      </div>
+
       <nav class="tabs">
         <button class="tab-button active" data-tab="dashboard">Главная</button>
         <button class="tab-button" data-tab="exchange">Обмен</button>
@@ -50,6 +54,18 @@
             <div class="card mini-card">
               <div class="label">Активность рефералов</div>
               <div class="value" id="activity-value">0</div>
+            </div>
+          </div>
+
+          <div class="card referral-card">
+            <div class="label">Реферальная ссылка</div>
+            <div class="referral-row">
+              <div id="referral-link" class="referral-link">—</div>
+              <button id="copy-link" class="ghost-button">Скопировать</button>
+            </div>
+            <div id="chat-link-wrap" class="chat-link hidden">
+              <span>Ссылка на чат</span>
+              <a id="chat-link" href="#" target="_blank" rel="noopener">Открыть</a>
             </div>
           </div>
         </section>

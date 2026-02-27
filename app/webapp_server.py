@@ -21,6 +21,7 @@ from app.services.levels import get_level
 
 config = load_config()
 bot = Bot(token=config.bot_token, parse_mode=ParseMode.HTML)
+bot_username: str | None = None
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "webapp")
 
@@ -94,6 +95,10 @@ async def api_me(request: Request) -> dict[str, Any]:
     total_referrals = int(row["total_referrals"])
     level = get_level(total_referrals)
 
+    referral_link = (
+        f"https://t.me/{bot_username}?start={user_id}" if bot_username else None
+    )
+
     return {
         "id": user_id,
         "username": username,
@@ -101,6 +106,8 @@ async def api_me(request: Request) -> dict[str, Any]:
         "total_referrals": total_referrals,
         "total_referral_messages": int(row["total_referral_messages"]),
         "level": level,
+        "referral_link": referral_link,
+        "group_invite_url": config.group_invite_url,
     }
 
 
@@ -162,6 +169,16 @@ async def api_exchange(request: Request, payload: ExchangeRequest) -> dict[str, 
 @app.on_event("shutdown")
 async def shutdown_event() -> None:
     await bot.session.close()
+
+
+@app.on_event("startup")
+async def startup_event() -> None:
+    global bot_username
+    try:
+        me = await bot.get_me()
+        bot_username = me.username
+    except Exception:
+        bot_username = None
 
 
 app.mount("/app", StaticFiles(directory=STATIC_DIR, html=True), name="webapp")
