@@ -16,6 +16,7 @@ from pydantic import BaseModel
 
 from app.config import load_config
 from app.database.db import get_db
+from app.database.schema import init_db
 from app.database.queries import (
     ensure_user,
     get_invite_link_for_user,
@@ -190,6 +191,8 @@ async def shutdown_event() -> None:
 @app.on_event("startup")
 async def startup_event() -> None:
     global bot_username
+    async with get_db() as db:
+        await init_db(db)
     try:
         me = await bot.get_me()
         bot_username = me.username

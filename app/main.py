@@ -25,6 +25,7 @@ async def main() -> None:
 
     bot = Bot(token=config.bot_token, parse_mode=ParseMode.HTML)
     await bot.get_me()
+    await bot.delete_webhook(drop_pending_updates=True)
 
     dp = Dispatcher()
     for router in setup_routers():
